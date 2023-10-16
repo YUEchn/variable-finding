@@ -1,0 +1,14 @@
+dist/*
+node_modules/*
+config/*
+public/*
+scripts/*
+package.json
+package-lock.json
+.gitignore
+README.md
+.eslintrc
+lint-staged.config.mjs
+out
+.vscode-test/
+*.vsix
