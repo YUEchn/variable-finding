@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "variable-finding.helloWorld",
-        "title": "Hello World"
+        "command": "variable-finding.mytest",
+        "title": "mytest"
       }
     ]
   },
