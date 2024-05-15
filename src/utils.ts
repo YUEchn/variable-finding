@@ -117,3 +117,48 @@ export function buildVariableHierarchy (node: Node, parentFunction: string | nul
   // }
   return variableHierarchy;
 };
+
+
+
+
+export function getWebviewContent() {
+  return `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Chart</title>
+          <!-- 引入 ECharts 库 -->
+          <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+      </head>
+      <body>
+          <div id="chart" style="width: 600px; height: 400px;"></div>
+          <script>
+              // 初始化 ECharts 实例
+              var myChart = echarts.init(document.getElementById('chart'));
+
+              // 指定图表的配置项和数据
+              var option = {
+                  title: {
+                      text: '柱状图示例'
+                  },
+                  tooltip: {},
+                  xAxis: {
+                      data: ['A', 'B', 'C', 'D', 'E']
+                  },
+                  yAxis: {},
+                  series: [{
+                      name: '销量',
+                      type: 'bar',
+                      data: [5, 20, 36, 10, 15]
+                  }]
+              };
+
+              // 使用刚指定的配置项和数据显示图表
+              myChart.setOption(option);
+          </script>
+      </body>
+      </html>
+  `;
+}

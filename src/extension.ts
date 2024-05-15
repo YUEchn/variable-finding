@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { INodeInfo } from './types';
-import { astToTree, buildVariableHierarchy, getAst } from './utils';
+import { astToTree, buildVariableHierarchy, getAst, getWebviewContent } from './utils';
 
 // This method is called when your extension is activated
 // 插件激活时执行的函数
@@ -53,6 +53,21 @@ export function activate(context: vscode.ExtensionContext) {
               let tree = buildVariableHierarchy(rootNode, null, []);
               variableHierarchy.push(...tree);
             });
+
+            // 创建侧开的标签页，展示数据
+            const panel = vscode.window.createWebviewPanel(
+                'chartView', // 唯一标识符，表示panel类型，用于区分不同的 Webview Panel
+                'Chart', // 标题，显示在面板顶部 
+                vscode.ViewColumn.Beside, // 在旁边侧开
+                // vscode.ViewColumn.One, // 打开一个新的标签页
+                {
+                    enableScripts: true // 允许在 Webview 中执行脚本
+                }
+            );
+
+            // 加载你的 HTML 内容，可以是本地文件或者动态生成的内容
+            panel.webview.html = getWebviewContent();
+            
           }
         } else {
           console.log('不需要解析');
