@@ -30,9 +30,11 @@
     "commitlint": "commitlint --config commitlint.config.js -e -V"
   },
   "devDependencies": {
+    "@babel/traverse": "^7.24.5",
     "@commitlint/cli": "^17.8.0",
     "@commitlint/config-angular": "^17.8.0",
     "@commitlint/config-conventional": "^17.8.0",
+    "@types/babel__traverse": "^7.20.5",
     "@types/mocha": "^10.0.2",
     "@types/node": "18.x",
     "@types/vscode": "^1.83.0",

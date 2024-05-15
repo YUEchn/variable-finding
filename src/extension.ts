@@ -1,7 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { astToTree, getAst } from './utils';
+import { INodeInfo } from './types';
+import { astToTree, buildVariableHierarchy, getAst } from './utils';
 
 // This method is called when your extension is activated
 // 插件激活时执行的函数
@@ -34,29 +35,31 @@ export function activate(context: vscode.ExtensionContext) {
       } as { [key: string]: string };
 
       if(editor){
-        let uri = editor.document.uri;  // 获取当前打开文件的uri
-        let filePath = uri.fsPath;  // 当前文件的路径
-        let fileName = filePath.split('\\').reverse()[0];  // 当前文件的文件名
+        let uri = editor.document.uri; // 获取当前打开文件的uri
+        let filePath = uri.fsPath; // 当前文件的路径
+        let fileName = filePath.split('\\').reverse()[0]; // 当前文件的文件名
         let extension: string | undefined = fileName.indexOf('.') !== -1 ? fileName.split('.').pop() : '';
         // 只有符合的文件才会被进一步处理
         if (extension && Object.keys(targetFileExtension).includes(extension)){
-          console.log('需要解析');
           // 解析文件
           let document = editor.document;
-          let text = document.getText();  // 获取当前文件的文本内容
-          let ast = getAst(text, targetFileExtension[extension]);  // 解析得到的ast
+          let text = document.getText(); // 获取当前文件的文本内容
+          let ast = getAst(text, targetFileExtension[extension]); // 解析得到的ast
 
+          let variableHierarchy: any[] = [];
           if(ast){
-            let tree = astToTree(ast);
-            console.log('ast', text, tree, tree);
-            
+            let rootNodes = ast.program.body;
+            rootNodes.forEach(rootNode => {
+              let tree = buildVariableHierarchy(rootNode, null, []);
+              variableHierarchy.push(...tree);
+            });
           }
         } else {
           console.log('不需要解析');
         }
 
 
-        vscode.window.showInformationMessage('current file: ' +  fileName); // 这个没有被执行
+        vscode.window.showInformationMessage('current file: ' + fileName); 
       } else {
         vscode.window.showInformationMessage('No file');
         return;
