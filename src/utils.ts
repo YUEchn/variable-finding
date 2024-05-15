@@ -1,10 +1,10 @@
-import { parse} from '@babel/parser';
-import traverse, { Node } from "@babel/traverse";
+import { parse } from '@babel/parser';
+import traverse, { Node } from '@babel/traverse';
 import { TreeNode } from './treeNode';
 import { INodeInfo } from './types';
 
 // 将文本解析为ast
-export function getAst(text: string, plugin: string){
+export function getAst(text: string, plugin: string) {
   let ast = null;
   try {
     ast = parse(text, {
@@ -18,48 +18,50 @@ export function getAst(text: string, plugin: string){
       ast = parse(text, {
         sourceType: 'script',
         //@ts-ignore
-        plugins: [plugin]
+        plugins: [plugin],
       });
-    } catch (error){
+    } catch (error) {
       console.error('Error parsing using sourceType "script":', error);
-    } 
+    }
   }
-  
+
   return ast;
 }
 
-
 // 将ast转化为层次结构树
-export function astToTree(ast: any): TreeNode{
-    const rootNode = new TreeNode('ast.type');
+export function astToTree(ast: any): TreeNode {
+  const rootNode = new TreeNode('ast.type');
 
-    if(ast.children && ast.children.length > 0){
-        for (const child of ast.children){
-            const childNode = astToTree(child);
-            rootNode.addChild(childNode);
-        }
+  if (ast.children && ast.children.length > 0) {
+    for (const child of ast.children) {
+      const childNode = astToTree(child);
+      rootNode.addChild(childNode);
     }
-    return rootNode;
+  }
+  return rootNode;
 }
 
-
-export function buildVariableHierarchy (node: Node, parentFunction: string | null| undefined, variableHierarchy: INodeInfo[]){
-  if (node.type === "VariableDeclaration") {
+export function buildVariableHierarchy(
+  node: Node,
+  parentFunction: string | null | undefined,
+  variableHierarchy: INodeInfo[],
+) {
+  if (node.type === 'VariableDeclaration') {
     console.log('进入了');
-    
+
     node.declarations.forEach((declaration: any) => {
       // Add the variable to the hierarchy under the current function
       if (parentFunction) {
         // Find the parent function in the hierarchy
         //@ts-ignore
         const parentFunctionNode = variableHierarchy.find(
-          (item: any) => item.name === parentFunction
+          (item: any) => item.name === parentFunction,
         );
         // If the parent function node exists, add the variable as its child
         if (parentFunctionNode) {
           parentFunctionNode.children.push({
             name: declaration.id.name,
-            type: "variable",
+            type: 'variable',
             children: [],
           });
         }
@@ -68,18 +70,18 @@ export function buildVariableHierarchy (node: Node, parentFunction: string | nul
         //@ts-ignore
         variableHierarchy.push({
           name: declaration.id.name,
-          type: "variable",
+          type: 'variable',
           children: [],
         });
       }
     });
   }
 
-  if (node.type === "FunctionDeclaration") {
+  if (node.type === 'FunctionDeclaration') {
     const functionName = node.id?.name;
     const functionNode = {
       name: functionName,
-      type: "function",
+      type: 'function',
       children: [],
     };
 
@@ -89,24 +91,22 @@ export function buildVariableHierarchy (node: Node, parentFunction: string | nul
       variableHierarchy.push(functionNode);
     } else {
       // Find the parent function in the hierarchy
-        //@ts-ignore
+      //@ts-ignore
       const parentFunctionNode = variableHierarchy.find(
-        (item: any) => item.name === parentFunction
+        (item: any) => item.name === parentFunction,
       );
       // If the parent function node exists, add the current function as its child
       if (parentFunctionNode) {
         parentFunctionNode.children.push(functionNode);
       }
     }
-    
+
     let nodes = node.body.body;
     //@ts-ignore
     nodes.forEach(n => {
       //@ts-ignore
       buildVariableHierarchy(n, functionName, variableHierarchy);
     });
-
-
   }
 
   // if (node.type === "BlockStatement") {
@@ -116,46 +116,86 @@ export function buildVariableHierarchy (node: Node, parentFunction: string | nul
   //   });
   // }
   return variableHierarchy;
-};
-
-
-
+}
 
 export function getWebviewContent() {
+  let data = [
+    {
+      name: 'A',
+      children: [
+        {
+          name: 'B',
+          children: [
+            {
+              name: 'C',
+            },
+            {
+              name: 'D',
+            },
+          ],
+        },
+      ],
+    },
+  ];
+  // Return the HTML content to be displayed in the webview
   return `
       <!DOCTYPE html>
       <html lang="en">
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Chart</title>
-          <!-- 引入 ECharts 库 -->
+          <title>Tree Chart</title>
+          <!-- Include ECharts library -->
           <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
       </head>
       <body>
           <div id="chart" style="width: 600px; height: 400px;"></div>
           <script>
-              // 初始化 ECharts 实例
+              // Initialize ECharts instance
               var myChart = echarts.init(document.getElementById('chart'));
 
-              // 指定图表的配置项和数据
+              // Specify chart configuration and data
               var option = {
                   title: {
-                      text: '柱状图示例'
+                      text: 'Tree Chart Example'
                   },
                   tooltip: {},
-                  xAxis: {
-                      data: ['A', 'B', 'C', 'D', 'E']
-                  },
-                  yAxis: {},
                   series: [{
-                      name: '销量',
-                      type: 'bar',
-                      data: [5, 20, 36, 10, 15]
+                      type: 'tree',
+
+                      // 树状图的数据
+                      data: ${JSON.stringify(data)}, // 这样写才生效
+                    //   data: [{
+                    //     name: 'AA',
+                    //     children: [{
+                    //         name: 'B',
+                    //         children: [{
+                    //             name: 'C'
+                    //         }, {
+                    //             name: 'D'
+                    //         }]
+                    //     }]
+                    // }],
+
+                      // 树状图的布局方式
+                      orient: 'vertical',
+
+                      // 树状图的配置
+                      symbol: 'emptyCircle',
+                      symbolSize: 7,
+
+                      // 树状图节点的标签设置
+                      label: {
+                          normal: {
+                              position: 'top',
+                              verticalAlign: 'middle',
+                              align: 'right'
+                          }
+                      }
                   }]
               };
 
-              // 使用刚指定的配置项和数据显示图表
+              // Use the specified configuration and data to display the chart
               myChart.setOption(option);
           </script>
       </body>
