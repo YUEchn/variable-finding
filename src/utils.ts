@@ -118,25 +118,7 @@ export function buildVariableHierarchy(
   return variableHierarchy;
 }
 
-export function getWebviewContent() {
-  let data = [
-    {
-      name: 'A',
-      children: [
-        {
-          name: 'B',
-          children: [
-            {
-              name: 'C',
-            },
-            {
-              name: 'D',
-            },
-          ],
-        },
-      ],
-    },
-  ];
+export function getWebviewContent(data: any) {
   // Return the HTML content to be displayed in the webview
   return `
       <!DOCTYPE html>

@@ -64,9 +64,35 @@ export function activate(context: vscode.ExtensionContext) {
                     enableScripts: true // 允许在 Webview 中执行脚本
                 }
             );
+            // const data = [{
+            //   name: 'root',
+            //   chidlren: variableHierarchy
+            // }]
 
+            let data = [
+              {
+                name: 'A',
+                children: [
+                  {
+                    name: 'B',
+                    children: [
+                      {
+                        name: 'C',
+                      },
+                      {
+                        name: 'D',
+                        
+                    children: [],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ];
+            ;console.log(data);
+            
             // 加载你的 HTML 内容，可以是本地文件或者动态生成的内容
-            panel.webview.html = getWebviewContent();
+            panel.webview.html = getWebviewContent(data);
             
           }
         } else {
